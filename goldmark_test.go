@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	tw "github.com/client9/typewriter"
-	typewriter "github.com/client9/typewriter/goldmark"
+	typewriter "github.com/client9/goldmark-typewriter"
 	gm "github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
 )
