@@ -1,0 +1,8 @@
+module github.com/client9/goldmark-typewriter
+
+go 1.22.0
+
+require (
+	github.com/client9/typewriter v0.0.0-20260501055218-424ebfdc269e
+	github.com/yuin/goldmark v1.8.2
+)

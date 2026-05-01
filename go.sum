@@ -1,0 +1,4 @@
+github.com/client9/typewriter v0.0.0-20260501055218-424ebfdc269e h1:4gparhwAkK+G2zbZA1MjUm0XRO1Yo0Spvltot67jthY=
+github.com/client9/typewriter v0.0.0-20260501055218-424ebfdc269e/go.mod h1:kGqiJh7SwAGVmqk79zMLTEo3BIoYyzfq2UIbxvI0qOQ=
+github.com/yuin/goldmark v1.8.2 h1:kEGpgqJXdgbkhcOgBxkC0X0PmoPG1ZyoZ117rDVp4zE=
+github.com/yuin/goldmark v1.8.2/go.mod h1:ip/1k0VRfGynBgxOz0yCqHrbZXhcjxyuS66Brc7iBKg=
