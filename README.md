@@ -1,10 +1,11 @@
 # goldmark-typewriter
 
 A [goldmark](https://github.com/yuin/goldmark) extension that converts typographic
-("smart") Unicode characters back to their plain ASCII equivalents.
+("smart") Unicode characters — and Unicode style variants like bold and italic — back
+to their plain ASCII equivalents.
 
 Built on [github.com/client9/typewriter](https://github.com/client9/typewriter). All
-`Category` constants and option functions are re-exported so you only need one import.
+constants and option functions are re-exported so you only need one import.
 
 ## Install
 
@@ -24,13 +25,17 @@ With options:
 
 ```go
 md := goldmark.New(goldmark.WithExtensions(
-    typewriter.New(typewriter.WithoutCategory(typewriter.Math)),
+    typewriter.New(
+        typewriter.WithoutCategory(typewriter.Math),
+        typewriter.WithBold("**", "**"),
+        typewriter.WithItalic("_", "_"),
+    ),
 ))
 ```
 
 ## What it converts
 
-All categories are active by default.
+### Character substitutions (all active by default)
 
 | Category | Examples | Result |
 |----------|---------|--------|
@@ -42,7 +47,21 @@ All categories are active by default.
 | Math | `×` `÷` `≠` `≤` `≥` `→` | `x` `/` `!=` `<=` `>=` `->` |
 | Ligatures | `ﬁ` `ﬂ` `ﬀ` `ﬃ` | `fi` `fl` `ff` `ffi` |
 | Bullets | `•` `†` `‡` | `*` `*` `**` |
-| Spaces | NBSP, thin, en, em, figure, hair spaces | plain space |
+| Spaces | NBSP, thin, en, em, figure, hair, U+2028, U+2029 | plain space |
+
+### Unicode style variants (opt-in)
+
+Runs of styled Unicode characters — common in copy-pasted LinkedIn posts, Twitter
+formatting tricks, and AI-generated content — are detected and wrapped.
+
+| Option | Input | Output |
+|--------|-------|--------|
+| `WithBold("**", "**")` | `𝗛𝗲𝗹𝗹𝗼` | `**Hello**` |
+| `WithItalic("_", "_")` | `𝘸𝘰𝘳𝘭𝘥` | `_world_` |
+| `WithBoldItalic("***", "***")` | `𝙃𝙚𝙡𝙡𝙤` | `***Hello***` |
+| `WithMonospace("` + "`" + `", "` + "`" + `")` | `𝙷𝚎𝚕𝚕𝚘` | `` `Hello` `` |
+| `WithSuperscript("^", "")` | `mc²` | `mc^2` |
+| `WithSubscript("", "")` | `H₂O` | `H2O` |
 
 ## Prose vs code content
 
@@ -55,8 +74,8 @@ The extension preserves code content because goldmark's HTML renderer reads code
 and fenced blocks directly from the original source bytes — AST-level replacement is not
 possible there. This is a constraint of goldmark's architecture, not a policy choice.
 
-To also normalise code content (for example, smart quotes inside a shell command pasted
-from a blog), use `typewriter.ReplaceBytes` on the raw source before parsing:
+To also normalise code content (e.g., smart quotes inside a pasted shell command), use
+`typewriter.ReplaceBytes` on raw source before parsing:
 
 ```go
 import tw "github.com/client9/typewriter"
@@ -69,8 +88,6 @@ md.Convert(clean, &buf)
 
 ### Enable only specific categories
 
-`WithCategory` sets the active categories to exactly what you pass, replacing the default:
-
 ```go
 // Only convert dashes and ellipses.
 typewriter.New(typewriter.WithCategory(typewriter.Dashes | typewriter.Ellipsis))
@@ -78,22 +95,11 @@ typewriter.New(typewriter.WithCategory(typewriter.Dashes | typewriter.Ellipsis))
 
 ### Disable specific categories
 
-`WithoutCategory` removes categories from the active set:
-
 ```go
 typewriter.New(typewriter.WithoutCategory(typewriter.Math))
 ```
 
-Options compose left-to-right:
-
-```go
-typewriter.New(
-    typewriter.WithCategory(typewriter.CategoryAll),
-    typewriter.WithoutCategory(typewriter.Math | typewriter.Bullets),
-)
-```
-
-### Override or exclude individual mappings
+### Override or exclude individual characters
 
 ```go
 typewriter.New(
@@ -103,19 +109,42 @@ typewriter.New(
 )
 ```
 
+### Convert Unicode bold/italic to markdown
+
+```go
+typewriter.New(
+    typewriter.WithBold("**", "**"),
+    typewriter.WithItalic("_", "_"),
+)
+```
+
+### Convert Unicode bold/italic to HTML
+
+```go
+typewriter.New(
+    typewriter.WithBold("<b>", "</b>"),
+    typewriter.WithItalic("<i>", "</i>"),
+)
+```
+
+### Superscripts and subscripts
+
+```go
+typewriter.New(
+    typewriter.WithSuperscript("^", ""),  // E=mc² → E=mc^2
+    typewriter.WithSubscript("", ""),     // H₂O  → H2O
+)
+```
+
 ## Using with the typographer
 
-goldmark's [typographer extension](https://github.com/yuin/goldmark#built-in-extensions)
-converts ASCII punctuation to typographic Unicode. typewriter is its complement.
+goldmark's typographer and this extension **cannot be meaningfully combined in a single
+goldmark instance**. The typographer is an inline parser (priority 9999) that fires
+during tokenisation — before any AST transformer runs. It converts ASCII → typographic
+as `ast.String` nodes; the typewriter transformer walks only `ast.KindText` and cannot
+undo that.
 
-They **cannot be meaningfully combined in a single goldmark instance**: the typographer is
-an inline parser and always fires during tokenisation, before any AST transformer runs.
-In a single instance the typographer fires first, converting ASCII → typographic; the
-typewriter transformer then has nothing left to do (and cannot undo `ast.String` nodes
-the typographer produced).
-
-For consistent smart-typography output from mixed-source input — where some content
-already contains curly quotes and some does not — use a two-pass approach:
+For consistent smart-typography output from mixed-source input, use a two-pass approach:
 
 ```go
 import (
@@ -134,4 +163,4 @@ md.Convert(clean, &buf)
 ## Related
 
 - [github.com/client9/typewriter](https://github.com/client9/typewriter) — the core
-  conversion package; use directly when you don't need goldmark integration
+  package; use directly for non-goldmark pipelines or raw-byte preprocessing
