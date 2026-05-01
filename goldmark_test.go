@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"testing"
 
-	tw "github.com/client9/typewriter"
 	typewriter "github.com/client9/goldmark-typewriter"
+	tw "github.com/client9/typewriter"
 	gm "github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
 )
