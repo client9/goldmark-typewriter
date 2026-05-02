@@ -1,4 +1,7 @@
 # goldmark-typewriter
+[![Go Reference](https://pkg.go.dev/badge/github.com/client9/goldmark-typewriter.svg)](https://pkg.go.dev/github.com/client9/goldmark-typewriter)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Build Status](https://github.com/client9/goldmark-typewriter/actions/workflows/go.yml/badge.svg)](https://github.com/client9/goldmark-typewriter/actions)
 
 A [goldmark](https://github.com/yuin/goldmark) extension that converts typographic
 ("smart") Unicode characters — and Unicode style variants like bold and italic — back
@@ -164,3 +167,8 @@ md.Convert(clean, &buf)
 
 - [github.com/client9/typewriter](https://github.com/client9/typewriter) — the core
   package; use directly for non-goldmark pipelines or raw-byte preprocessing
+
+## License
+
+[MIT](/LICENSE)
+
