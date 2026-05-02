@@ -7,6 +7,8 @@ import (
 	"github.com/yuin/goldmark/text"
 )
 
+// transformer walks ast.KindText nodes and applies typewriter replacements.
+// Code and raw HTML nodes are skipped; see the architecture note in CLAUDE.md.
 type transformer struct {
 	r *tw.Replacer
 }

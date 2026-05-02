@@ -1,9 +1,14 @@
 // Package typewriter provides a goldmark extension that applies typewriter
-// conversions as an AST transformer.
+// conversions to prose text as a post-parse AST transformer.
 //
-// All Category constants and Option constructors are defined here so callers
-// need only one import. For preprocessing raw markdown source before parsing,
-// use github.com/client9/typewriter directly.
+// Typical usage:
+//
+//	md := goldmark.New(goldmark.WithExtensions(typewriter.New()))
+//
+// All re-exported Category and UnicodeStyle constants, and all Option
+// constructors, are defined here so callers need only one import. To
+// preprocess raw markdown source before parsing (e.g. to normalise code
+// spans), use github.com/client9/typewriter.ReplaceBytes directly.
 package typewriter
 
 import (
@@ -16,7 +21,8 @@ import (
 // Category is an alias for the core Category type.
 type Category = tw.Category
 
-// Category constants — all active by default.
+// Category constants re-exported from github.com/client9/typewriter.
+// Default is the set active when no WithCategory option is supplied.
 const (
 	Quotes      = tw.Quotes
 	Dashes      = tw.Dashes
@@ -34,7 +40,7 @@ const (
 // UnicodeStyle is an alias for the core UnicodeStyle type.
 type UnicodeStyle = tw.UnicodeStyle
 
-// UnicodeStyle constants.
+// UnicodeStyle constants re-exported from github.com/client9/typewriter.
 const (
 	Bold        = tw.Bold
 	Italic      = tw.Italic
@@ -44,7 +50,7 @@ const (
 	Subscript   = tw.Subscript
 )
 
-// Option configures the extension.
+// Option is a functional option for configuring the Extension.
 type Option func(*tw.Config)
 
 // WithCategory sets the active categories to exactly c, replacing the default.
@@ -57,8 +63,8 @@ func WithoutCategory(c Category) Option {
 	return func(cfg *tw.Config) { cfg.Categories &^= c }
 }
 
-// WithMapping adds or overrides a single character conversion. Set to to an
-// empty string to leave the character unchanged.
+// WithMapping adds or overrides a single character conversion. Set to to ""
+// to leave the character unchanged.
 func WithMapping(from, to string) Option {
 	return func(cfg *tw.Config) {
 		if cfg.Overrides == nil {
@@ -106,13 +112,14 @@ func withRun(style tw.UnicodeStyle, prefix, suffix string) Option {
 	}
 }
 
-// Extension is the goldmark extension. Create with New.
+// Extension is a goldmark.Extender that applies typewriter conversions to
+// prose text during AST transformation. Create with New.
 type Extension struct {
 	r *tw.Replacer
 }
 
-// New creates the goldmark extension. With no options all Default categories
-// are active and no Unicode style runs are converted.
+// New creates the Extension. With no options the Default category set is
+// active and no Unicode style runs are converted.
 func New(opts ...Option) *Extension {
 	cfg := tw.Config{Categories: tw.Default}
 	for _, o := range opts {
