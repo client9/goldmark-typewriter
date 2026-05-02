@@ -7,8 +7,7 @@ A [goldmark](https://github.com/yuin/goldmark) extension that converts typograph
 ("smart") Unicode characters — and Unicode style variants like bold and italic — back
 to their plain ASCII equivalents.
 
-Built on [github.com/client9/typewriter](https://github.com/client9/typewriter). All
-constants and option functions are re-exported so you only need one import.
+Built on [github.com/client9/typewriter](https://github.com/client9/typewriter). 
 
 ## Install
 
