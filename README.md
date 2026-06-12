@@ -9,6 +9,8 @@ to their plain ASCII equivalents.
 
 Built on [github.com/client9/typewriter](https://github.com/client9/typewriter). 
 
+See also [github.com/client9/demoji](https://github.com/client9/demoji) and [github.com/client9/goldmark-demoji](https://github.com/client9/goldmark-demoji) for emoji conversion and normalization.
+
 ## Install
 
 ```sh
