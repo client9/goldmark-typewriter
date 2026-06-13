@@ -74,6 +74,28 @@ func TestCodeContent(t *testing.T) {
 	}
 }
 
+func TestMultipleTextSiblings(t *testing.T) {
+	// Inline markup (strong, link, etc.) creates sibling text nodes in the
+	// same parent. All siblings must be converted; a prior bug truncated the
+	// walk after the first replacement because ReplaceChild zeroed nextSibling.
+	got := render(t, typewriter.New(), "wait… **hello** and—")
+	want := "<p>wait... <strong>hello</strong> and---</p>\n"
+	if got != want {
+		t.Errorf("got %q\nwant %q", got, want)
+	}
+}
+
+func TestSoftLineBreak(t *testing.T) {
+	// A text node at the end of a soft-wrapped line carries SoftLineBreak=true.
+	// Replacing it with ast.NewString lost that flag; renderString emits nothing
+	// after the text, collapsing the two lines into one.
+	got := render(t, typewriter.New(), "wait…\nline two")
+	want := "<p>wait...\nline two</p>\n"
+	if got != want {
+		t.Errorf("got %q\nwant %q", got, want)
+	}
+}
+
 func TestChaining(t *testing.T) {
 	// Genuinely mixed input: first pair is Unicode curly quotes (U+201C/U+201D),
 	// second pair is plain ASCII quotes.
