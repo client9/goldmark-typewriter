@@ -54,6 +54,8 @@ const (
 type Option func(*tw.Config)
 
 // WithCategory sets the active categories to exactly c, replacing the default.
+// Because it overwrites the entire mask, it should appear before any
+// WithoutCategory calls in the same New() invocation.
 func WithCategory(c Category) Option {
 	return func(cfg *tw.Config) { cfg.Categories = c }
 }
@@ -75,33 +77,38 @@ func WithMapping(from, to string) Option {
 }
 
 // WithBold converts runs of Unicode bold characters, wrapping with prefix and suffix.
-// Empty prefix and suffix strips to plain ASCII.
+// Empty prefix and suffix strips to plain ASCII. Each style may be set at most
+// once; a second WithBold call is silently ignored by the underlying replacer.
 func WithBold(prefix, suffix string) Option {
 	return withRun(tw.Bold, prefix, suffix)
 }
 
 // WithItalic converts runs of Unicode italic characters, wrapping with prefix and suffix.
+// Each style may be set at most once.
 func WithItalic(prefix, suffix string) Option {
 	return withRun(tw.Italic, prefix, suffix)
 }
 
 // WithBoldItalic converts runs of Unicode bold-italic characters, wrapping with prefix and suffix.
+// Each style may be set at most once.
 func WithBoldItalic(prefix, suffix string) Option {
 	return withRun(tw.BoldItalic, prefix, suffix)
 }
 
 // WithMonospace converts runs of Unicode monospace characters, wrapping with prefix and suffix.
+// Each style may be set at most once.
 func WithMonospace(prefix, suffix string) Option {
 	return withRun(tw.Monospace, prefix, suffix)
 }
 
 // WithSuperscript converts runs of superscript characters, wrapping with prefix and suffix.
-// A common convention is prefix "^" with empty suffix.
+// A common convention is prefix "^" with empty suffix. Each style may be set at most once.
 func WithSuperscript(prefix, suffix string) Option {
 	return withRun(tw.Superscript, prefix, suffix)
 }
 
 // WithSubscript converts runs of subscript characters, wrapping with prefix and suffix.
+// Each style may be set at most once.
 func WithSubscript(prefix, suffix string) Option {
 	return withRun(tw.Subscript, prefix, suffix)
 }
